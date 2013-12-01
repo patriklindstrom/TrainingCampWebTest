@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -13,22 +14,40 @@ namespace TrainingCampWebTest
     {
         private const string IE_DRIVER_PATH = @"D:\Users\Patrik\Documents\GitHub\TrainingCampWebTest\";
         static void Main(string[] args)
-        {        
-         IWebDriver driver;
-         StringBuilder verificationErrors;
-         string baseURL;
-        
-            driver = new FirefoxDriver();            
-             //driver = new InternetExplorerDriver(IE_DRIVER_PATH);          
+        {
+            System.Console.WriteLine("MultithreadTest press Enter to Start");
+            System.Console.ReadLine();
+            
+            Thread thread1 = new Thread(new ThreadStart(SeleniumTestChore));
+            Thread thread2 = new Thread(new ThreadStart(SeleniumTestChore));
+            Thread thread3 = new Thread(new ThreadStart(SeleniumTestChore));
+            thread1.Start();
+            thread2.Start();
+            thread3.Start();
+            thread1.Join();
+            thread2.Join();
+            thread3.Join();
+
+            System.Console.WriteLine("Done press Enter to exit");
+            System.Console.ReadLine();
+        }
+
+        public static void SeleniumTestChore()
+        {
+            IWebDriver driver;
+            StringBuilder verificationErrors;
+            string baseURL;
+
+            driver = new FirefoxDriver();
+            //driver = new InternetExplorerDriver(IE_DRIVER_PATH);          
             baseURL = "http://trainingcampsk.apphb.com/";
             verificationErrors = new StringBuilder();
             TestHomePage(driver, baseURL);
             //Change to englisht
-            TestHomePageLanguage(driver: driver, baseUrl: baseURL, language: "en", firstProjectMeetingText: "FIRST PROJECT MEETING");
+            TestHomePageLanguage(driver: driver, baseUrl: baseURL, language: "en",
+                firstProjectMeetingText: "FIRST PROJECT MEETING");
             //Change to japanese
             TestHomePageLanguage(driver: driver, baseUrl: baseURL, language: "ja", firstProjectMeetingText: "最初のプロジェクト会議");
-            System.Console.WriteLine("Done press Enter to exit");
-            System.Console.ReadLine();
         }
 
         private static void TestHomePageLanguage(IWebDriver driver, string baseUrl,string language,string firstProjectMeetingText)
