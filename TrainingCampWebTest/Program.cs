@@ -82,21 +82,25 @@ namespace TrainingCampWebTest
             var newWindowHandles = driver.WindowHandles;
             var openedWindowHandle = newWindowHandles.Except(windowHandles).Single();
             driver.SwitchTo().Window(openedWindowHandle);
-           // driver.Navigate().GoToUrl(newUrl );
+            driver.Navigate().GoToUrl(newUrl);
+            //Other way http://stackoverflow.com/a/9122450/648076
+            // Does not work now
+            //openTab(driver, newUrl);
+           // SwitchWindow(driver);
         }
 
-        public void trigger(IWebDriver driver,string script, IWebElement element)
+        public static void trigger(IWebDriver driver,string script, IWebElement element)
         {
             ((IJavaScriptExecutor)driver).ExecuteScript(script, element);
         }
 
-        public Object trigger(IWebDriver driver, string script)
+        public static Object trigger(IWebDriver driver, string script)
         {
             return ((IJavaScriptExecutor)driver).ExecuteScript(script);
         }
 
 
-        public void openTab(IWebDriver driver,String url)
+        public static void openTab(IWebDriver driver,String url)
         {
             String script =
                 "var d=document,a=d.createElement('a');a.target='_blank';a.href='%s';a.innerHTML='.';d.body.appendChild(a);return a";
@@ -112,6 +116,17 @@ namespace TrainingCampWebTest
             {
                 throw new WebDriverException( "Unable to open tab");
             }       
+}
+ 
+public static void SwitchWindow(IWebDriver driver)  {
+    Debug.Assert(driver.WindowHandles != null, "driver.WindowHandles != null");
+    ISet<String> foo = new SortedSet<string>();
+    IReadOnlyList<string> handles = driver.WindowHandles;
+
+    String current = driver.CurrentWindowHandle;
+    
+    String newTab = handles.LastOrDefault();
+    driver.SwitchTo().Window(newTab);
 }
     }
 }
