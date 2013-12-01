@@ -47,6 +47,7 @@ namespace TrainingCampWebTest
                 firstProjectMeetingText: "FIRST PROJECT MEETING");
             //Change to japanese
             TestHomePageLanguage(driver: driver, baseUrl: BASE_URL, language: "ja", firstProjectMeetingText: "最初のプロジェクト会議");
+            OpenNewTab(driver: driver, newUrl:"https://en.wikipedia.org/wiki/Main_Page");
         }
 
         private static void TestHomePageLanguage(IWebDriver driver, string baseUrl,string language,string firstProjectMeetingText)
@@ -72,5 +73,45 @@ namespace TrainingCampWebTest
             driver.FindElement(By.Id("comments")).SendKeys("I want to join this great camp");
             driver.FindElement(By.Id("submit")).Click();
         }
+
+        public static void OpenNewTab(IWebDriver driver, string newUrl)
+        {
+            var windowHandles = driver.WindowHandles;
+            var script = string.Format("window.open('{0}', '_blank');", newUrl);
+            ((IJavaScriptExecutor)driver).ExecuteScript(script);
+            var newWindowHandles = driver.WindowHandles;
+            var openedWindowHandle = newWindowHandles.Except(windowHandles).Single();
+            driver.SwitchTo().Window(openedWindowHandle);
+           // driver.Navigate().GoToUrl(newUrl );
+        }
+
+        public void trigger(IWebDriver driver,string script, IWebElement element)
+        {
+            ((IJavaScriptExecutor)driver).ExecuteScript(script, element);
+        }
+
+        public Object trigger(IWebDriver driver, string script)
+        {
+            return ((IJavaScriptExecutor)driver).ExecuteScript(script);
+        }
+
+
+        public void openTab(IWebDriver driver,String url)
+        {
+            String script =
+                "var d=document,a=d.createElement('a');a.target='_blank';a.href='%s';a.innerHTML='.';d.body.appendChild(a);return a";
+            Object element = trigger(driver,String.Format(script, url));
+            var webElement = element as IWebElement;
+            if (webElement != null)
+            {
+                IWebElement anchor = webElement;
+                anchor.Click();
+                trigger(driver,"var a=arguments[0];a.parentNode.removeChild(a);", anchor);
+            }
+        else
+            {
+                throw new WebDriverException( "Unable to open tab");
+            }       
+}
     }
 }
