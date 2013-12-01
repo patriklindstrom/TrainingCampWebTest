@@ -13,41 +13,40 @@ namespace TrainingCampWebTest
     class Program
     {
         private const string IE_DRIVER_PATH = @"D:\Users\Patrik\Documents\GitHub\TrainingCampWebTest\";
+        public const string BASE_URL = "http://trainingcampsk.apphb.com/";
         static void Main(string[] args)
         {
             System.Console.WriteLine("MultithreadTest press Enter to Start");
             System.Console.ReadLine();
             
-            Thread thread1 = new Thread(new ThreadStart(SeleniumTestChore));
-            Thread thread2 = new Thread(new ThreadStart(SeleniumTestChore));
-            Thread thread3 = new Thread(new ThreadStart(SeleniumTestChore));
-            thread1.Start();
-            thread2.Start();
-            thread3.Start();
-            thread1.Join();
-            thread2.Join();
-            thread3.Join();
-
+            int noOfConcurrentTest = 3;
+            var arrThreads = new List<Thread>();
+            for (int j = 0; j < noOfConcurrentTest; j++)
+            {
+                arrThreads.Add(new Thread(new ThreadStart(SeleniumTestChore)));
+            }
+            foreach (var arrThread in arrThreads)
+            {
+                arrThread.Start();
+            }
+            foreach (var arrThread in arrThreads)
+            {
+                arrThread.Join();
+            }
             System.Console.WriteLine("Done press Enter to exit");
             System.Console.ReadLine();
         }
 
         public static void SeleniumTestChore()
         {
-            IWebDriver driver;
-            StringBuilder verificationErrors;
-            string baseURL;
-
-            driver = new FirefoxDriver();
+            IWebDriver driver = new FirefoxDriver();
             //driver = new InternetExplorerDriver(IE_DRIVER_PATH);          
-            baseURL = "http://trainingcampsk.apphb.com/";
-            verificationErrors = new StringBuilder();
-            TestHomePage(driver, baseURL);
+            TestHomePage(driver, BASE_URL);
             //Change to englisht
-            TestHomePageLanguage(driver: driver, baseUrl: baseURL, language: "en",
+            TestHomePageLanguage(driver: driver, baseUrl: BASE_URL, language: "en",
                 firstProjectMeetingText: "FIRST PROJECT MEETING");
             //Change to japanese
-            TestHomePageLanguage(driver: driver, baseUrl: baseURL, language: "ja", firstProjectMeetingText: "最初のプロジェクト会議");
+            TestHomePageLanguage(driver: driver, baseUrl: BASE_URL, language: "ja", firstProjectMeetingText: "最初のプロジェクト会議");
         }
 
         private static void TestHomePageLanguage(IWebDriver driver, string baseUrl,string language,string firstProjectMeetingText)
